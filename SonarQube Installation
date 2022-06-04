@@ -1,0 +1,70 @@
+#!/bin/sh
+# This installation script for installing sonarQube is based on swith cases and it is embedded with "if" commands.
+# The $1 arguments used are "manage" and "install".
+# manage creates user "sonar", assigns password and completes authentication.
+# install downloads and installs the packages.
+case $1 in
+        manage)
+                echo This module relates to the sonar user management.
+                echo Have you created a RedHat AWS server that has 4GB memory or more, and opened port 9000?
+                echo Enter 1 for yes and 2 for no.
+                read response
+                if
+                        (( $response == 1 ))
+                then
+                        sudo adduser sonar
+                        sleep 1
+                        echo User has been successfully added
+                        echo Enter a password
+                        read -s password
+                        sleep 1
+                        echo $password | sudo passwd sonar --stdin
+                        echo Granting sudo powers to sonar...
+                        sleep 1
+                        sudo echo "sonar ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/sonar
+                        echo Enabling password authentication...
+                        sleep 1
+                        sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
+                        echo Restarting sshd to activate password authentication...
+                        sudo systemctl restart sshd
+                        echo Switching to sonar...
+                        sleep 1
+                        sudo su sonar
+                else
+                        echo You will need to create a server with a minimum of 4GB memory
+                fi;;
+        install)
+                echo This module completes the installation of sonarQube, java and other apps.
+                cd /opt
+                echo Installing the apps to get us started...
+                sudo yum -y install unzip wget git tree vim
+                echo Installing Java JDK 1.8+, the required version for sonarQube to start
+                sudo wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+                echo Downloading and installing sonarQube...
+                sleep 1
+                sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.8.zip
+                echo Unzipping the sonarQube file...
+                sleep 1
+                sudo unzip sonarqube-7.8.zip
+                echo Deleting the zip file...
+                sleep 1
+                sudo rm -rfv sonarqube-7.8.zip
+                echo Renaming the sonarQube home directory...
+                sleep 1
+                sudo mv sonarqube-7.8 sonarqube
+                echo Updating permissions for sonarQube...
+                sleep 1
+                sudo chown -R sonar:sonar /opt/sonarqube/
+                sudo chmod -R 775 /opt/sonarqube/
+                echo Starting and checking the status of the sonarQube server...
+                sleep 1
+                sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+                sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
+                curl -v localhost:9000
+                echo The default user name and password for sonarQube is admin and admin respectively.
+                echo Updating hostname...
+                sudo hostname sonarQube
+                sudo su $(whoami);;
+        *)
+                echo This is an incorrect argument. Arguments should either be "manage" or "install";;
+esac
