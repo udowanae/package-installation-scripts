@@ -56,7 +56,7 @@ case $1 in
                 sudo mv sonarqube-7.8 sonarqube
                 echo Updating permissions for sonarQube...
                 sleep 1
-                sudo chown -R sonar:sonar /opt/sonarqube/
+                sudo chown -R  $(whoami):$(whoami) /opt/sonarqube/
                 sudo chmod -R 775 /opt/sonarqube/
                 echo Starting and checking the status of the sonarQube server...
                 sleep 1
