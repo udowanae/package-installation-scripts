@@ -66,6 +66,5 @@ case $1 in
                 ;;
         *)
                 echo This is an incorrect argument. Arguments should either be "manage" or "install"
-                echo Usage $0 {manage | install}
                 ;;
 esac
