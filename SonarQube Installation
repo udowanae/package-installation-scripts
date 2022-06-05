@@ -26,10 +26,11 @@ case $1 in
                         sleep 1
                         sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
                         echo Restarting sshd to activate password authentication...
-                        sudo systemctl restart sshd
-                        echo Switching to sonar...
                         sleep 1
-                        sudo su sonar
+                        sudo systemctl restart sshd
+                        echo Updating hostname...
+                        sudo hostname sonarQube
+                        sudo su $(whoami)
                 else
                         echo You will need to create a server with a minimum of 4GB memory
                 fi;;
@@ -62,9 +63,9 @@ case $1 in
                 sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
                 curl -v localhost:9000
                 echo The default user name and password for sonarQube is admin and admin respectively.
-                echo Updating hostname...
-                sudo hostname sonarQube
-                sudo su $(whoami);;
+                ;;
         *)
-                echo This is an incorrect argument. Arguments should either be "manage" or "install";;
+                echo This is an incorrect argument. Arguments should either be "manage" or "install"
+                echo Usage $0 {manage | install}
+                ;;
 esac
