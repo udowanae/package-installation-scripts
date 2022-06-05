@@ -62,7 +62,6 @@ case $1 in
                 sleep 1
                 sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start
                 sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
-                curl -v localhost:9000
                 echo The default user name and password for sonarQube is admin and admin respectively.
                 ;;
         *)
