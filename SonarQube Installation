@@ -63,6 +63,12 @@ case $1 in
                 sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start
                 sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
                 echo The default user name and password for sonarQube is admin and admin respectively.
+                echo Changing permissions for sonarQube...
+                sleep 1
+                sudo chown -R  sonar:sonar /opt/sonarqube/
+                echo Switching users to sonar to execute sonarqube tasks
+                sleep 1
+                sudo su sonar
                 ;;
         *)
                 echo This is an incorrect argument. Arguments should either be "manage" or "install"
