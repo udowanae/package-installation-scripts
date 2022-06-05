@@ -14,7 +14,7 @@ case $1 in
                 then
                         sudo adduser sonar
                         sleep 1
-                        echo User has been successfully added
+                        echo sonar has been successfully added
                         echo Enter a password
                         read -s password
                         sleep 1
