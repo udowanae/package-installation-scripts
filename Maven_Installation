@@ -36,6 +36,7 @@ then
         echo Refreshing the .bash_profile file...
         sleep 1
         source ~/.bash_profile
+        sudo su $(whoami)
 else
         echo You will need to set up an AWS server with a minimum of 4GB RAM.
 fi
