@@ -1,8 +1,9 @@
 #!/bin/sh
 # This installation script for installing sonarQube is based on swith cases and it is embedded with "if" commands.
-# The $1 arguments used are "manage" and "install".
+# The $1 arguments used are "manage", "install" and "launch".
 # manage creates user "sonar", assigns password and completes authentication.
 # install downloads and installs the packages.
+# launch will start and check status of sonarqube as a sonar user
 case $1 in
         manage)
                 echo This module relates to the sonar user management.
@@ -36,6 +37,8 @@ case $1 in
                 fi;;
         install)
                 echo This module completes the installation of sonarQube, java and other apps.
+                echo Copying the installation script to the opt directory
+                sudo cp $0 /opt/$0
                 cd /opt
                 echo Installing the apps to get us started...
                 sudo yum -y install unzip wget git tree vim
@@ -66,16 +69,22 @@ case $1 in
                 echo Changing permissions for sonarQube...
                 sleep 1
                 sudo chown -R  sonar:sonar /opt/sonarqube/
+                sudo chown -R  sonar:sonar /opt/$0
                 echo Switching users to sonar to execute sonarqube tasks
                 sleep 1
-                echo PLEASE COPY AND RUN THE COMMAND BELOW TO START SONARCUBE UNDER sonar USER
-                echo "sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start"
                 sudo su sonar
                 ;;
+          launch)
+                sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+                sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
+                #The command below will delete the script from /opt
+                sudo rm -r /opt/$0
+                ;;
         *)
-                echo "Usage: $0 { manage | install }"
+                echo "Usage: $0 { manage | install | launch }"
                 echo You have not specified an argument.
                 echo manage will create sonar user
                 echo install will install all apps including SonarQube
+                echo launch will start and check status of sonarqube as a sonar user
                 ;;
 esac
