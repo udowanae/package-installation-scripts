@@ -68,9 +68,14 @@ case $1 in
                 sudo chown -R  sonar:sonar /opt/sonarqube/
                 echo Switching users to sonar to execute sonarqube tasks
                 sleep 1
+                echo PLEASE COPY AND RUN THE COMMAND BELOW TO START SONARCUBE UNDER sonar USER
+                echo "sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start"
                 sudo su sonar
                 ;;
         *)
-                echo This is an incorrect argument. Arguments should either be "manage" or "install"
+                echo "Usage: $0 { manage | install }"
+                echo You have not specified an argument.
+                echo manage will create sonar user
+                echo install will install all apps including SonarQube
                 ;;
 esac
