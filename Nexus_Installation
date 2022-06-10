@@ -15,7 +15,7 @@ case $1 in
                 then
                         sudo adduser nexus
                         sleep 1
-                        echo sonar has been successfully added
+                        echo nexus has been successfully added
                         echo Enter a password
                         read -s password
                         sleep 1
