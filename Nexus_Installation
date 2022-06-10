@@ -1,5 +1,5 @@
 #!/bin/sh
-# This installation script for installing sonarQube is based on swith cases and it is embedded with "if" commands.
+# This installation script for installing Nexus is based on swith cases and it is embedded with "if" commands.
 # The $1 arguments used are "manage", "install" and "launch".
 # manage creates user "nexus", assigns password and completes authentication.
 # install downloads and installs the packages.
@@ -30,8 +30,9 @@ case $1 in
                         sleep 1
                         sudo systemctl restart sshd
                         echo Creating a soft link of the installation package in /usr/bin
-                        sudo ln -s $0 /usr/bin/$0
-                        sudo chown -R nexus:nexus /usr/bin/$0       
+                        sudo chown -R nexus:nexus $0
+                        sudo chmod -R 777 $0
+                        sudo ln -s $0 /usr/bin/$0      
                         echo Switching users to nexus to execute Nexus tasks
                         sleep 1
                         sudo su nexus
