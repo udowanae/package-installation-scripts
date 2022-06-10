@@ -7,7 +7,7 @@ read response
 if
         (( $response == 1 ))
 then
-        echo Let's start by adding nexus as user
+        echo Let us start by adding nexus as user
         sudo adduser nexus
         sleep 1
         echo nexus has been successfully added
@@ -45,7 +45,7 @@ then
         sudo rm -rfv nexus-3.15.2-01-unix.tar.gz
         echo Renaming the installation directory...
         sleep 1
-        mv /opt/nexus-3.15.2-01 /opt/nexus
+        sudo mv /opt/nexus-3.15.2-01 /opt/nexus
         echo Changing permissions for /opt/nexus and /opt/sonatype-work directories...
         sleep 1
         sudo chown -R $(whoami):$(whoami) /opt/nexus
