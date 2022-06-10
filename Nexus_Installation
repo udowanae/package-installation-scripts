@@ -1,5 +1,5 @@
 #!/bin/sh
-# This installation script for installing Nexus is based on swith cases and it is embedded with "if" commands.
+# This installation script for installing sonarQube is based on swith cases and it is embedded with "if" commands.
 # The $1 arguments used are "manage", "install" and "launch".
 # manage creates user "nexus", assigns password and completes authentication.
 # install downloads and installs the packages.
@@ -29,16 +29,16 @@ case $1 in
                         echo Restarting sshd to activate password authentication...
                         sleep 1
                         sudo systemctl restart sshd
-                        echo Updating hostname...
-                        sudo hostname nexus
-                        sudo su $(whoami)
+                        echo Copying the installation script to the opt directory...
+                        sudo cp $0 /opt/$0
+                        echo Switching users to nexus to execute Nexus tasks
+                        sleep 1
+                        sudo su nexus
                 else
                         echo You will need to create a server with a minimum of 4GB memory
                 fi;;
         install)
                 echo This module completes the installation of Nexus, java and other apps.
-                echo Copying the installation script to the opt directory
-                sudo cp $0 /opt/$0
                 cd /opt
                 echo Installing the apps to get us started...
                 sudo yum -y install unzip wget git tree vim
@@ -67,7 +67,7 @@ case $1 in
                 sudo chown -R  nexus:nexus /opt/$0
                 echo Updating the nexus.rc file...
                 sleep 1
-                echo "run_as_user="nexus"" > /opt/nexus/bin/nexus.rc
+                sudo echo "run_as_user="nexus"" > /opt/nexus/bin/nexus.rc
                 echo Configuring nexus to run as a service...
                 sleep 1
                 sudo ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
@@ -84,6 +84,9 @@ case $1 in
                 echo The default user name and password for Nexus is ADMIN and ADMIN123 respectively.
                 #The command below will delete the script from /opt
                 sudo rm -r /opt/$0
+                echo Updating hostname...
+                sudo hostname nexus
+                sudo su $(whoami)
                 ;;
         *)
                 echo "Usage: $0 { manage | install | launch }"
