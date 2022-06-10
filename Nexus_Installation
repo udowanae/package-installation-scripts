@@ -29,11 +29,9 @@ case $1 in
                         echo Restarting sshd to activate password authentication...
                         sleep 1
                         sudo systemctl restart sshd
-                        echo Changing permissions for the installation script...
-                        sleep 1
-                        sudo chmod -R 777 $0 
-                        echo Copying the installation script to the opt directory...
-                        sudo cp $0 /opt/$0
+                        echo Creating a soft link of the installation package in /usr/bin
+                        sudo ln -s $0 /usr/bin/$0
+                        sudo chown -R nexus:nexus /usr/bin/$0       
                         echo Switching users to nexus to execute Nexus tasks
                         sleep 1
                         sudo su nexus
@@ -67,7 +65,6 @@ case $1 in
                 sudo chown -R nexus:nexus /opt/sonatype-work
                 sudo chmod -R 775 /opt/nexus
                 sudo chmod -R 775 /opt/sonatype-work
-                sudo chown -R  nexus:nexus /opt/$0
                 echo Updating the nexus.rc file...
                 sleep 1
                 sudo echo "run_as_user="nexus"" > /opt/nexus/bin/nexus.rc
@@ -86,7 +83,7 @@ case $1 in
                 sudo systemctl status nexus
                 echo The default user name and password for Nexus is ADMIN and ADMIN123 respectively.
                 #The command below will delete the script from /opt
-                sudo rm -r /opt/$0
+                sudo rm -r /usr/bin/$0
                 echo Updating hostname...
                 sudo hostname nexus
                 sudo su $(whoami)
