@@ -76,12 +76,11 @@ case $1 in
                 sudo su nexus
                 ;;
           launch)
-                #The command below will delete the script from /opt
-                sudo rm -r /opt/$0
                 echo The default user name and password for Nexus is ADMIN and ADMIN123 respectively.
                 echo Enabling, starting and checking the status of the the nexus services...
                 sudo systemctl enable nexus
                 sudo systemctl start nexus
+                sudo systemctl status nexus
                 ;;
         *)
                 echo "Usage: $0 { manage | install | launch }"
