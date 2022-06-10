@@ -70,7 +70,6 @@ case $1 in
                 echo Configuring nexus to run as a service...
                 sleep 1
                 sudo ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
-                sudo su nexus
                 echo Switching users to nexus to execute Nexus tasks
                 sleep 1
                 sudo su nexus
