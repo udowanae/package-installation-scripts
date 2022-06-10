@@ -29,6 +29,9 @@ case $1 in
                         echo Restarting sshd to activate password authentication...
                         sleep 1
                         sudo systemctl restart sshd
+                        echo Changing permissions for the installation script...
+                        sleep 1
+                        sudo chmod -R 777 $0 
                         echo Copying the installation script to the opt directory...
                         sudo cp $0 /opt/$0
                         echo Switching users to nexus to execute Nexus tasks
