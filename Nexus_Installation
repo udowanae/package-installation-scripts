@@ -1,73 +1,95 @@
 #!/bin/sh
-echo This installation script will install Nexus
-echo To install Nexus, Java and other applications that will aid will be installed 
-echo Have you created a RedHat AWS server that has 4gb RAM or more? 
-echo Enter 1 for yes and 2 for no.
-read response
-if
-        (( $response == 1 ))
-then
-        echo Let us start by adding nexus as user
-        sudo adduser nexus
-        sleep 1
-        echo nexus has been successfully added
-        echo Enter a password
-        read -s password
-        sleep 1
-        echo $password | sudo passwd nexus --stdin
-        echo Granting sudo powers to nexus...
-        sleep 1
-        sudo echo "nexus ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/nexus
-        echo Enabling password authentication...
-        sleep 1
-        sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
-        echo Restarting sshd to activate password authentication...
-        sleep 1
-        sudo systemctl restart sshd
-        echo Updating hostname...
-        sudo hostname nexus
-        echo Changing directories for apps installation...
-        cd /opt
-        echo Installing apps to get us running...
-        sudo yum install wget vim nano tree unzip git-all -y
-        echo Installing java...
-        sudo yum install java-11-openjdk-devel java-1.8.0-openjdk-devel -y
-        sleep 1
-        java -version
-        echo Nexus software installation will start in a moment...
-        sleep 1
-        sudo wget http://download.sonatype.com/nexus/3/nexus-3.15.2-01-unix.tar.gz
-        echo Unzipping to start in a moment...
-        sleep 1
-        sudo tar -zxvf nexus-3.15.2-01-unix.tar.gz
-        echo Deleting the zip file...
-        sleep 1
-        sudo rm -rfv nexus-3.15.2-01-unix.tar.gz
-        echo Renaming the installation directory...
-        sleep 1
-        sudo mv /opt/nexus-3.15.2-01 /opt/nexus
-        echo Changing permissions for /opt/nexus and /opt/sonatype-work directories...
-        sleep 1
-        sudo chown -R $(whoami):$(whoami) /opt/nexus
-        sudo chown -R $(whoami):$(whoami) /opt/sonatype-work
-        sudo chmod -R 775 /opt/nexus
-        sudo chmod -R 775 /opt/sonatype-work
-        echo Updating the nexus.rc file...
-        sleep 1
-        echo "run_as_user="nexus"" >> /opt/nexus/bin/nexus.rc
-        echo Configuring nexus to run as a service...
-        sleep 1
-        sudo ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
-        echo Updating permissions for /opt/nexus and /opt/sonatype-work directories...
-        sleep 1
-        sudo chown -R nexus:nexus /opt/nexus
-        sudo chown -R nexus:nexus /opt/sonatype-work
-        sudo su nexus
-        echo Enabling, starting and checking the status of the the nexus services...
-        sudo systemctl enable nexus
-        sudo systemctl start nexus
-        sudo systemctl status nexus
-        echo The default nexus login details are ADMIN and ADMIN123 for userName and Password respectively.
-else
-        echo You will need to set up an AWS server with a minimum of 4GB RAM.
-fi
+# This installation script for installing Nexus is based on swith cases and it is embedded with "if" commands.
+# The $1 arguments used are "manage", "install" and "launch".
+# manage creates user "nexus", assigns password and completes authentication.
+# install downloads and installs the packages.
+# launch will start and check status of nexus server as a nexus user
+case $1 in
+        manage)
+                echo This module relates to the nexus user management.
+                echo Have you created a RedHat AWS server that has 4GB memory or more, and opened port 8081?
+                echo Enter 1 for yes and 2 for no.
+                read response
+                if
+                        (( $response == 1 ))
+                then
+                        sudo adduser nexus
+                        sleep 1
+                        echo sonar has been successfully added
+                        echo Enter a password
+                        read -s password
+                        sleep 1
+                        echo $password | sudo passwd nexus --stdin
+                        echo Granting sudo powers to nexus...
+                        sleep 1
+                        sudo echo "nexus ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/nexus
+                        echo Enabling password authentication...
+                        sleep 1
+                        sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
+                        echo Restarting sshd to activate password authentication...
+                        sleep 1
+                        sudo systemctl restart sshd
+                        echo Updating hostname...
+                        sudo hostname nexus
+                        sudo su $(whoami)
+                else
+                        echo You will need to create a server with a minimum of 4GB memory
+                fi;;
+        install)
+                echo This module completes the installation of Nexus, java and other apps.
+                echo Copying the installation script to the opt directory
+                sudo cp $0 /opt/$0
+                cd /opt
+                echo Installing the apps to get us started...
+                sudo yum -y install unzip wget git tree vim
+                echo Installing Java JDK 1.8+, the required version for Nexus to start
+                sudo yum install java-11-openjdk-devel java-1.8.0-openjdk-devel -y
+                sleep 1
+                java -version
+                echo Nexus software installation will start in a moment...
+                sleep 1
+                sudo wget http://download.sonatype.com/nexus/3/nexus-3.15.2-01-unix.tar.gz
+                echo Unzipping to start in a moment...
+                sleep 1
+                sudo tar -zxvf nexus-3.15.2-01-unix.tar.gz
+                echo Deleting the zip file...
+                sleep 1
+                sudo rm -rfv nexus-3.15.2-01-unix.tar.gz
+                echo Renaming the installation directory...
+                sleep 1
+                sudo mv /opt/nexus-3.15.2-01 /opt/nexus
+                echo Changing permissions for /opt/nexus and /opt/sonatype-work directories...
+                sleep 1
+                sudo chown -R nexus:nexus /opt/nexus
+                sudo chown -R nexus:nexus /opt/sonatype-work
+                sudo chmod -R 775 /opt/nexus
+                sudo chmod -R 775 /opt/sonatype-work
+                sudo chown -R  nexus:nexus /opt/$0
+                echo Updating the nexus.rc file...
+                sleep 1
+                echo "run_as_user="nexus"" > /opt/nexus/bin/nexus.rc
+                echo Configuring nexus to run as a service...
+                sleep 1
+                sudo ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
+                sudo su nexus
+                echo Switching users to nexus to execute Nexus tasks
+                sleep 1
+                sudo su nexus
+                ;;
+          launch)
+                echo Enabling, starting and checking the status of the the nexus services...
+                sudo systemctl enable nexus
+                sudo systemctl start nexus
+                sudo systemctl status nexus
+                echo The default user name and password for Nexus is ADMIN and ADMIN123 respectively.
+                #The command below will delete the script from /opt
+                sudo rm -r /opt/$0
+                ;;
+        *)
+                echo "Usage: $0 { manage | install | launch }"
+                echo You have not specified an argument.
+                echo manage will create sonar user
+                echo install will install all apps including Nexus
+                echo launch will start and check status of Nexus as a nexus user
+                ;;
+esac
