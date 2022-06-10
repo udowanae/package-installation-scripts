@@ -75,7 +75,7 @@ case $1 in
                 sudo su nexus
                 ;;
           launch)
-                echo The default user name and password for Nexus is ADMIN and ADMIN123 respectively.
+                echo The default user name and password for Nexus is admin and admin123 respectively.
                 echo Enabling, starting and checking the status of the the nexus services...
                 sudo systemctl enable nexus
                 sudo systemctl start nexus
