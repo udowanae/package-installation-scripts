@@ -29,12 +29,10 @@ case $1 in
                         echo Restarting sshd to activate password authentication...
                         sleep 1
                         sudo systemctl restart sshd
-                        echo Creating a soft link of the installation package in /usr/bin
-                        sudo chown -R nexus:nexus $0
-                        sudo chmod -R 777 $0
-                        sudo ln -s $0 /usr/bin/$0      
-                        echo Switching users to nexus to execute Nexus tasks
-                        sleep 1
+                        sudo cp $0 /opt/$0
+                        cd /opt
+                        sudo chown -R nexus:nexus /opt/$0
+                        sudo chmod -R 775 /opt/$0                        
                         sudo su nexus
                 else
                         echo You will need to create a server with a minimum of 4GB memory
@@ -84,7 +82,7 @@ case $1 in
                 sudo systemctl status nexus
                 echo The default user name and password for Nexus is ADMIN and ADMIN123 respectively.
                 #The command below will delete the script from /opt
-                sudo rm -r /usr/bin/$0
+                sudo rm -r /opt/$0
                 echo Updating hostname...
                 sudo hostname nexus
                 sudo su $(whoami)
