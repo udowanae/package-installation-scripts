@@ -30,10 +30,11 @@ then
         sleep 1
         sudo mv apache-maven-3.8.6/ maven
         echo Setting Environmental Variable for $whoami ...
-        cd /opt/maven
-        export M2_HOME=/opt/maven
-        cd /opt/maven/bin
-        export PATH=$PATH:/opt/maven/bin
+        sleep 1
+        echo "export M2_HOME=/opt/maven" >> ~/.bash_profile
+        echo "export PATH=$PATH:/opt/maven/bin" >> ~/.bash_profile 
+        echo Refreshing ".bash_profile" file...
+        source ~/.bash_profile
         mvn -v
         sudo su $(whoami)
 else
