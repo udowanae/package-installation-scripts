@@ -32,7 +32,7 @@ then
         echo Setting Environmental Variable for $whoami ...
         sleep 1
         echo "export M2_HOME=/opt/maven" >> ~/.bash_profile
-        echo "export PATH=$PATH:/opt/maven/bin" >> ~/.bash_profile 
+        echo "export PATH=$PATH:$M2_HOME/bin" >> ~/.bash_profile 
         echo Refreshing ".bash_profile" file...
         source ~/.bash_profile
         mvn -v
