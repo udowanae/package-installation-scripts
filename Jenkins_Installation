@@ -1,0 +1,38 @@
+#!/bin/sh
+echo This script will help you with the installation of Jenkins
+echo You will need to add a security group and open port 8080 with source set at 0.0.0.0/0.
+echo You will need to launch an instance with a 4GB memory.
+echo Do you want to continue with your Jenkins Installation?
+echo Enter 1 for yes and 2 for no.
+read response
+if
+        (( $response == 1 ))
+then
+        echo Your installation will commence in a moment...
+        sleep 1
+        cd /opt
+        echo Installing apps to get us running...
+        sudo yum install wget vim tree unzip -y
+        echo Installing java...
+        sudo yum install java-1.8.0-openjdk-devel -y
+        sudo wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+        sudo yum install jdk-8u131-linux-x64.rpm -y
+        sleep 1
+        java -version
+        sleep 1
+        echo Installing the Jenkins key and repository...
+        sleep 1
+        sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+        cd /etc/yum.repos.d/
+        sudo curl -O https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        echo Installing Jenkins...
+        sudo yum -y install jenkins  --nobest
+        echo Starting and verifying that the Jenkins service is running...
+        sudo systemctl start jenkins
+        sudo systemctl enable jenkins
+        sudo systemctl status jenkins
+        echo Obtaining the initial admin password for Jenkins...
+        sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+else
+        echo An instance with a 1 GB memory, for example t2.micro,  will be sufficient for this server.
+fi
