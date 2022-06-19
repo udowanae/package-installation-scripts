@@ -34,5 +34,5 @@ then
         echo Obtaining the initial admin password for Jenkins...
         sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 else
-        echo An instance with a 1 GB memory, for example t2.micro,  will be sufficient for this server.
+        echo An instance with a 4 GB memory, for example t2.medium,  will be sufficient for this server.
 fi
