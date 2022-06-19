@@ -9,7 +9,7 @@ if
 then
         echo Installing the EPEL repository...
         sleep 1
-        sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest- 8.noarch.rpm
+        sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y
         echo Installing NGINX Open Source...
         sleep 1
         sudo yum install nginx -y
