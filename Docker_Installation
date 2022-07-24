@@ -1,0 +1,22 @@
+#This script is suitable for installing Docker on Ubuntu
+
+#Step 1: Update all the software repository
+sudo apt update
+
+#Step 2: Install Docker
+sudo apt install docker.io -y
+
+#Step 3: Check the version of Docker you have
+docker --version
+
+#Step 4: Add ubuntu user to docker group so that you don't have to be using sudo to execute docker commands
+#sudo usermod -aG docker ubuntu 
+#          OR
+sudo gpasswd -aM ubuntu docker
+
+# Step 5: Exit from the current session and login again for the priviledges to be activated.
+#Alternatively, run
+sudo su ubuntu
+
+#Step 6: Get system-wide installation information on Docker
+docker info
