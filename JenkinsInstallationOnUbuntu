@@ -9,10 +9,10 @@ wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key |sudo gpg --dea
 sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 
 #The command below will enable "apt" to use the new repository.
-sudo apt update
+sudo apt update -y
 
 #The command below will install jenkins and all the required dependencies.
-sudo apt install jenkins
+sudo apt install jenkins -y
 
 #Check the status of your installation
 sudo systemctl status jenkins
