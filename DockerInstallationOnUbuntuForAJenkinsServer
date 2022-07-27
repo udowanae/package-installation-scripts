@@ -1,0 +1,18 @@
+#This script is suitable for installing Docker on an Ubuntu-Jenkins Server
+
+#Step 1: Update all the software repositories
+sudo apt update
+
+#Step 2: Install Docker
+sudo apt install docker.io -y
+
+#Step 3: Check the version of Docker you have
+docker --version
+
+#Step 4: Add jenkins user to docker group so that docker commands will run on Jenkins
+#sudo usermod -aG docker jenkins 
+#          OR
+sudo gpasswd -a jenkins docker
+
+#Step 5: Restart Jenkins to activate the command above
+sudo systemctl restart jenkins
