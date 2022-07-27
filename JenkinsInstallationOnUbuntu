@@ -1,0 +1,20 @@
+#!/bin/sh
+##This script will install Jenkins on Ubuntu server...
+
+echo Adding the repository key to your system...
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key |sudo gpg --dearmor -o /usr/share/keyrings/jenkins.gpg
+#The "gpg --dearmor" command above is used to convert the key into a format that "apt" recognizes.
+
+#The command below will add the Debian package repository address to /etc/apt/sources.list.d/jenkins.list
+sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+#The command below will enable "apt" to use the new repository.
+sudo apt update
+
+#The command below will install jenkins and all the required dependencies.
+sudo apt install jenkins
+
+#Check the status of your installation
+sudo systemctl status jenkins
+
+#Ensure that port 8080 is open on the firewall to access jenkins
