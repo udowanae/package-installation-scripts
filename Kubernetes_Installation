@@ -50,18 +50,25 @@ sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 
 #Start containerd
+echo "Restarting containerd..." 
 sudo systemctl restart containerd
+echo "Enabling containerd..."
 sudo systemctl enable containerd
 
 # Enable and start kubelet service
+echo "Reloading kubelet daemon..."
 sudo systemctl daemon-reload
+echo "Starting kubelet..."
 sudo systemctl start kubelet
+echo "Enabling the kubelet service..."
 sudo systemctl enable kubelet.service
 
 <<TheseWillApplyOnlyToTheManagerNode
+# Fetch images before cluster initialization
+sudo kubeadm config images pull
+
 # Initialize Kubernetes manager in the manager node
-sudo kubeadm init   --pod-network-cidr=10.244.0.0/16   --upload-certs --control-plane-endpoint=212.2.245.195 \
- --ignore-preflight-errors=Mem  --cri-socket /run/containerd/containerd.sock
+sudo kubeadm init   --pod-network-cidr=10.244.0.0/16
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -70,7 +77,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 # To verify whether kubectl is working or not, run the following command:
 kubectl get pods -o wide --all-namespaces
 
-#From the foregoing, all but 1 pod should be running: ‘kube-dns’. To resolve this, install a weave pod network.
+#From the foregoing, all but ‘coredns’ pod should be running. To resolve this, install a weave pod network.
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
 kubectl get nodes
