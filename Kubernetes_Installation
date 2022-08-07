@@ -73,5 +73,5 @@ TheseWillApplyOnlyToTheManagerNode
 #2. kubectl commands have to be executed in manager node/controller plane.
 #3. To check nodes, run "kubectl get nodes"
 #4. To deploy a sample application. run "kubectl run nginx-demo --image=nginx --port=80"
-#5. To create a Service object that exposes the deployment. run "kubectl expose deployment nginx-demo --port=80 --type=NodePort"
+#5. To create a Service object that exposes the deployment, run "kubectl expose deployment nginx-demo --port=80 --type=NodePort"
 #6. To list all services in the namespace or to get Node Port details, run "kubectl get services"
