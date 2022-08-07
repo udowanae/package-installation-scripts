@@ -70,7 +70,8 @@ sudo systemctl enable containerd
 
 <<TheseWillApplyOnlyToTheManagerNode
 # Initialize Kubernetes manager in the manager node
-sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-docker.sock
+sudo kubeadm init   --pod-network-cidr=10.244.0.0/16   --upload-certs --control-plane-endpoint=212.2.245.195 \
+ --ignore-preflight-errors=Mem  --cri-socket /run/containerd/containerd.sock
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
