@@ -5,37 +5,24 @@
 
 # Update the apt package index and install packages needed to use the Kubernetes apt repository
 sudo apt-get update -y
-sudo apt-get install -y ca-certificates curl
+sudo apt install -y apt-transport-https
 
 # Download the Google Cloud public signing key
-sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
 # Add the Kubernetes apt repository
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+EOF
 
 # Turn off Swap Space
 sudo swapoff -a
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
-# Install kubeadm, kubelet, and kubectl
+# Install kubeadm, kubelet, kubectl, and containerd
 sudo apt-get update -y
-sudo apt-get install -y kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
-
-# Enable and start kubelet service
-sudo systemctl daemon-reload
-sudo systemctl start kubelet
-sudo systemctl enable kubelet.service
-
-# Loading the br_netfilter module and let iptables see bridged traffic
-sudo modprobe overlay
-sudo modprobe br_netfilter
-sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-EOF
-sudo sysctl --system
+sudo apt-get install -y kubelet kubeadm kubectl containerd
+sudo apt-mark hold kubelet kubeadm kubectl containerd
 
 # Setup containerd
 sudo cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
@@ -56,17 +43,18 @@ EOF
 # Apply sysctl params without reboot
 sudo sysctl --system
 
-#Install and configure containerd 
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt update -y
-sudo apt install -y containerd.io
+#Configure containerd 
 sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 
 #Start containerd
 sudo systemctl restart containerd
 sudo systemctl enable containerd
+
+# Enable and start kubelet service
+sudo systemctl daemon-reload
+sudo systemctl start kubelet
+sudo systemctl enable kubelet.service
 
 <<TheseWillApplyOnlyToTheManagerNode
 # Initialize Kubernetes manager in the manager node
