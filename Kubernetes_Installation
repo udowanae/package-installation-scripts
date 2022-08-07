@@ -29,7 +29,7 @@ sudo systemctl enable kubelet.service
 
 #Install Container Runtime
 echo "Installing the required packages..."
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
 
 echo "Exporting the environmental variables..."
 DOCKER_EE_URL="https://repos.mirantis.com"
@@ -42,8 +42,8 @@ echo "Adding the stable repository to the system..."
 sudo add-apt-repository "deb [arch=$(dpkg --print-architecture)] $DOCKER_EE_URL/ubuntu focal stable"
 
 echo "Installing Mirantis Container Runtime(MCR)"
-sudo apt update
-sudo apt install docker-ee docker-ee-cli containerd.io
+sudo apt update -y
+sudo apt install -y docker-ee docker-ee-cli containerd.io
 
 echo "Starting the docker daemon..."
 sudo systemctl enable --now docker
