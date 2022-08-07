@@ -90,7 +90,7 @@ TheseWillApplyOnlyToTheManagerNode
 
 
 ### Note for Next Steps
-#1. To add worker nodes to the manager node, copy the kubeadm join token from the manager node and execute in all the worker nodes to create a cluster
+#1. To add worker nodes to the manager node, copy the kubeadm join token from the manager node and execute (using sudo) in all the worker nodes to create a cluster
 #2. kubectl commands have to be executed in manager node/controller plane.
 #3. To check nodes, run "kubectl get nodes"
 #4. To deploy a sample application. run "kubectl run nginx-demo --image=nginx --port=80"
