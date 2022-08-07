@@ -1,0 +1,77 @@
+# This script will help set up Kubernetes using Kubeadm In AWS EC2 Ubuntu Servers
+#You will need a minimum of 3 servers (1 manager and 2 workers)
+#The manager will require t2.medium, while the workers will require a minimum of 2GB RAM
+#You will need to open certain required ports. For our exercise, we will open "all trafic".
+
+#Update the apt package index and install packages needed to use the Kubernetes apt repository
+sudo apt-get update -y
+sudo apt-get install -y ca-certificates curl
+
+#Download the Google Cloud public signing key
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+#Add the Kubernetes apt repository
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+#Turn off Swap Space
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+#Install the Docker Engine
+
+echo "Updating the apt package index and installing packages to allow apt to use a repository over HTTPS..." 
+sudo apt-get update -y
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+echo "Adding the Docker official GPG key..."
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo "Setting up the repository..."
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+echo "Updating the apt package index, and installing the latest version of Docker Engine, containerd, and Docker Compose..."
+sudo apt-get update -y
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+#Install kubeadm, kubelet and kubectl
+sudo apt-get update -y
+sudo apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+sudo apt-mark hold kubelet kubeadm kubectl
+
+# Enable and start kubelet service
+sudo systemctl daemon-reload
+sudo systemctl start kubelet
+sudo systemctl enable kubelet.service
+
+<<TheseWillApplyOnlyToTheManagerNode
+# Initialize Kubernetes manager in the manager node
+sudo kubeadm init
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# To verify whether kubectl is working or not, run the following command:
+kubectl get pods -o wide --all-namespaces
+
+#From the foregoing, all but 1 pod should be running: ‘kube-dns’. To resolve this, install a weave pod network.
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+kubectl get nodes
+kubectl get pods --all-namespaces
+
+# Get token
+kubeadm token create --print-join-command
+
+TheseWillApplyOnlyToTheManagerNode
+
+
+### Note for Next Steps
+#1. To add worker nodes to the manager node, copy the kubeadm join token from the manager node and execute in all the worker nodes to create a cluster
+#2. kubectl commands have to be executed in manager node/controller plane.
+#3. To check nodes, run "kubectl get nodes"
+#4. To deploy a sample application. run "kubectl run nginx-demo --image=nginx --port=80"
+#5. To create a Service object that exposes the deployment. run "kubectl expose deployment nginx-demo --port=80 --type=NodePort"
+#6. To list all services in the namespace or to get Node Port details, run "kubectl get services"
