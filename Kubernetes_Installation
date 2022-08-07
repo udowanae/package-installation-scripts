@@ -48,15 +48,15 @@ sudo apt install -y docker-ee docker-ee-cli containerd.io
 echo "Starting the docker daemon..."
 sudo systemctl enable --now docker
 
-echo "Adding your user to the Docker group..." 
-sudo usermod -aG docker $USER
-newgrp docker
-
 echo "Enabling the cri-docker plugin..."
 sudo systemctl enable --now cri-docker.service
 
 echo "Proceed to pulling container images..."
 sudo kubeadm config images pull --cri-socket /run/cri-docker.sock
+
+echo "Adding your user to the Docker group..." 
+sudo usermod -aG docker $USER
+newgrp docker
 
 #You may check the status of your cri-docker service bu running the command below to identify the default socket as "/run/cri-docker.sock"
 #systemctl status cri-docker.socket
