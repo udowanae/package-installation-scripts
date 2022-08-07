@@ -17,24 +17,6 @@ echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https:/
 sudo swapoff -a
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
-#Install the Docker Engine
-
-echo "Updating the apt package index and installing packages to allow apt to use a repository over HTTPS..." 
-sudo apt-get update -y
-sudo apt-get install -y ca-certificates curl gnupg lsb-release
-
-echo "Adding the Docker official GPG key..."
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
-echo "Setting up the repository..."
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-echo "Updating the apt package index, and installing the latest version of Docker Engine, containerd, and Docker Compose..."
-sudo apt-get update -y
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
 #Install kubeadm, kubelet and kubectl
 sudo apt-get update -y
 sudo apt-get install -y kubelet kubeadm kubectl kubernetes-cni
@@ -45,9 +27,44 @@ sudo systemctl daemon-reload
 sudo systemctl start kubelet
 sudo systemctl enable kubelet.service
 
+#Install Container Runtime
+echo "Installing the required packages..."
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
+echo "Exporting the environmental variables..."
+DOCKER_EE_URL="https://repos.mirantis.com"
+DOCKER_EE_VERSION=20.10
+
+echo "Adding the GPG keys for the repository..."
+curl -fsSL "${DOCKER_EE_URL}/ubuntu/gpg" | sudo apt-key add -
+
+echo "Adding the stable repository to the system..."
+sudo add-apt-repository "deb [arch=$(dpkg --print-architecture)] $DOCKER_EE_URL/ubuntu focal stable"
+
+echo "Installing Mirantis Container Runtime(MCR)"
+sudo apt update
+sudo apt install docker-ee docker-ee-cli containerd.io
+
+echo "Starting the docker daemon..."
+sudo systemctl enable --now docker
+
+echo "Adding your user to the Docker group..." 
+sudo usermod -aG docker $USER
+newgrp docker
+
+echo "Enabling the cri-docker plugin..."
+sudo systemctl enable --now cri-docker.service
+
+echo "Proceed to pulling container images..."
+sudo kubeadm config images pull --cri-socket /run/cri-docker.sock
+
+#You may check the status of your cri-docker service bu running the command below to identify the default socket as "/run/cri-docker.sock"
+#systemctl status cri-docker.socket
+
+
 <<TheseWillApplyOnlyToTheManagerNode
 # Initialize Kubernetes manager in the manager node
-sudo kubeadm init
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-docker.sock
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -73,5 +90,5 @@ TheseWillApplyOnlyToTheManagerNode
 #2. kubectl commands have to be executed in manager node/controller plane.
 #3. To check nodes, run "kubectl get nodes"
 #4. To deploy a sample application. run "kubectl run nginx-demo --image=nginx --port=80"
-#5. To create a Service object that exposes the deployment, run "kubectl expose deployment nginx-demo --port=80 --type=NodePort"
+#5. To create a Service object that exposes the pod, run "kubectl expose pod nginx-demo --port=80 --type=NodePort"
 #6. To list all services in the namespace or to get Node Port details, run "kubectl get services"
