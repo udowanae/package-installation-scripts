@@ -1,3 +1,4 @@
+#!/bin/sh
 # This script will help set up Kubernetes using Kubeadm In AWS EC2 Ubuntu Servers
 # You will need a minimum of 3 servers (1 manager and 2 workers)
 # The manager will require t2.medium, while the workers will require a minimum of 2GB RAM
