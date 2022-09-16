@@ -2,7 +2,7 @@
 echo This script will help you with the installation of Jenkins
 echo You will need to add a security group and open port 8080 with source set at 0.0.0.0/0.
 echo You will need to launch an instance with a 4GB memory.
-echo Do you want to continue with your Jenkins Installation?
+echo Do you want to continue with your Jenkins Installation? 
 echo Enter 1 for yes and 2 for no.
 read response
 if
