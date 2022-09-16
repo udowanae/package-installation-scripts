@@ -13,18 +13,16 @@ then
         cd /opt
         echo Installing apps to get us running...
         sudo yum install wget vim tree unzip -y
-        echo Installing java...
-        sudo yum -y install java-11-openjdk java-11-openjdk-devel
-        sudo wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
-        sudo yum install jdk-8u131-linux-x64.rpm -y
+        echo Installing java ...
+        sudo yum -y install java-11-openjdk
         sleep 1
         java -version
         sleep 1
         echo Installing the Jenkins key and repository...
         sleep 1
-        sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+        sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
         cd /etc/yum.repos.d/
-        sudo curl -O https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
         echo Installing Jenkins...
         sudo yum -y install jenkins  --nobest
         echo Starting and verifying that the Jenkins service is running...
